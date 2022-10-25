@@ -1,4 +1,3 @@
-import React from 'react';
 import './results.scss';
 
 const Results = (props) => {
