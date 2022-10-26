@@ -11,3 +11,11 @@ Starter code from [Code Fellows Repo](https://github.com/codefellows/seattle-cod
 ### UML
 
 ![UML](./public/RestyP1.png)
+
+## Phase 2
+
+Altered App.js from a class to a function and implemented hooks within it and child components where necessary. Post and Get route functions were created within App.js and are called within `callApi` function.
+
+### UML
+
+![UML](./public/RestyP2.png)
