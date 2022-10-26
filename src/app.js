@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from 'axios';
+import {useState} from 'react';
 
 import './app.scss';
 
@@ -9,40 +11,69 @@ import Footer from './components/footer/footer.jsx';
 import Form from './components/form/form.jsx';
 import Results from './components/results/results.jsx';
 
-class App extends React.Component {
+const App = (props) => {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: null,
-      requestParams: {},
-    };
+  let [data, setData] = useState(null);
+  const [requestParams, setRequestParams] = useState({});
+
+  const callApi = (requestParams) => {
+
+    if(requestParams.method === 'get'){
+      getRequest(requestParams);
+    }
+    if(requestParams.method === 'post'){
+      postRequest(requestParams);
+    }
+    // if(requestParams.method === 'put'){
+    //   putRequest(requestParams);
+    // }
+    // if(requestParams.method === 'delete'){
+    //   deleteRequest(requestParams);
+    // }
+      console.log(requestParams.url);
+      setRequestParams(requestParams);
+    }
+
+  async function getRequest(params){
+     await axios.get(params.url).then(res => {
+      setData(res.data);
+    })
+    .catch(err => {
+      let message = `${err.response.data.error}. ${err.message} ${err.code}.`;
+      console.log(message);
+    });
   }
 
-  callApi = (requestParams) => {
-    // mock output
-    const data = {
-      count: 2,
-      results: [
-        {name: 'fake thing 1', url: 'http://fakethings.com/1'},
-        {name: 'fake thing 2', url: 'http://fakethings.com/2'},
-      ],
-    };
-    this.setState({data, requestParams});
+  async function postRequest(params){
+    await axios.post(params.url, params.obj).then(res=> {
+      setData([...res.data, res.data.obj])
+      console.log(data);
+    })
+    .catch(err => {
+      let message = `${err.response.data.error}. ${err.message} ${err.code}.`;
+      console.log(message);
+    });
   }
+  
+  // function putRequest(params){
 
-  render() {
+  // }
+
+  // function deleteRequest(params){
+
+  // }
+
     return (
       <React.Fragment>
         <Header />
-        <div>Request Method: {this.state.requestParams.method}</div>
-        <div>URL: {this.state.requestParams.url}</div>
-        <Form handleApiCall={this.callApi} />
-        <Results data={this.state.data} />
+        <div>Request Method: {requestParams.method}</div>
+        <div>URL: {requestParams.url}</div>
+        <Form handleApiCall={callApi} />
+        <Results data={data} />
         <Footer />
       </React.Fragment>
     );
-  }
+  
 }
 
 export default App;
