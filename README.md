@@ -21,3 +21,6 @@ Altered App.js from a class to a function and implemented hooks within it and ch
 ### UML
 
 ![UML](./public/RestyP2.png)
+
+## Phase 3
+

@@ -7,14 +7,14 @@ const Form = (props) => {
 
   const [restMethod, setRestMethod] = useState('');
   const [queryUrl, setQueryUrl] = useState('');
-  const [obj, setObj] = useState({});
+  const [body, setBody] = useState({});
 
   const handleSubmit = e =>{
     e.preventDefault();
     const formData = {
       method: restMethod,
       url: queryUrl,
-      obj: obj,
+      body: body,
       // https://pokeapi.co/api/v2/pokemon
     };
     handleApiCall(formData);
@@ -43,7 +43,7 @@ const Form = (props) => {
           <label>
             {
             restMethod === 'post' || restMethod === 'put'?
-            <textarea name='json-field' onChange={(e) => setObj(e.target.value)}/> : null
+            <textarea name='json-field' onChange={(e) => setBody(e.target.value)}/> : null
             }
           </label>
         </form>

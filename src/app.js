@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {useState} from 'react';
+import {useState, useEffect, useReducer } from 'react';
 
 import './app.scss';
 
@@ -11,18 +11,39 @@ import Footer from './components/footer/footer.jsx';
 import Form from './components/form/form.jsx';
 import Results from './components/results/results.jsx';
 
+
+const initialState = {};
+
+const queryReducer = (queryHistory, action) => {
+  return {...queryHistory, query: [...queryHistory, action.payload]}
+}
+
 const App = (props) => {
 
   let [data, setData] = useState(null);
   const [requestParams, setRequestParams] = useState({});
 
-  const callApi = (requestParams) => {
+  let [queryHistory, dispatch] = useReducer(queryReducer, initialState);
 
+  const addQuery = () => {
+    let action = {
+      method: data.method,
+      url: data.url,
+      body: data.body,
+    }
+    dispatch(action);
+  }
+
+  useEffect(() => {
     if(requestParams.method === 'get'){
       getRequest(requestParams);
+      addQuery();
+      console.log(queryHistory);
     }
     if(requestParams.method === 'post'){
       postRequest(requestParams);
+      addQuery();
+      console.log(queryHistory);
     }
     // if(requestParams.method === 'put'){
     //   putRequest(requestParams);
@@ -30,8 +51,13 @@ const App = (props) => {
     // if(requestParams.method === 'delete'){
     //   deleteRequest(requestParams);
     // }
-      console.log(requestParams.url);
+  },[requestParams]);
+
+  const callApi = (requestParams) => {
+
+      console.log(requestParams.body);
       setRequestParams(requestParams);
+
     }
 
   async function getRequest(params){
@@ -45,8 +71,8 @@ const App = (props) => {
   }
 
   async function postRequest(params){
-    await axios.post(params.url, params.obj).then(res=> {
-      setData([...res.data, res.data.obj])
+    await axios.post(params.url, params.body).then(res=> {
+      setData([...res.data, res.data.body])
       console.log(data);
     })
     .catch(err => {
@@ -68,6 +94,7 @@ const App = (props) => {
         <Header />
         <div>Request Method: {requestParams.method}</div>
         <div>URL: {requestParams.url}</div>
+        {/* <Form/> */}
         <Form handleApiCall={callApi} />
         <Results data={data} />
         <Footer />
