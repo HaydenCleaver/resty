@@ -16,4 +16,14 @@ describe('Form Component', () => {
 
   });
 
+  test('checks REST method', () => {
+
+    let handleRestMethod = jest.fn();
+
+    render(<Form />)
+    let button = screen.getByText('GET');
+    fireEvent.click(button);
+    expect(handleRestMethod).toHaveBeenCalled();
+
+  });
 });

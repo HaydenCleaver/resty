@@ -1,37 +1,47 @@
-import {useState} from 'react';
+import {useReducer} from 'react';
 import './form.scss';
 
-const Form = (props) => {
+import { appReducer } from '../../app';
 
-  let {handleApiCall} = props;
+const initialState = {
+  restData: {
+    method: '',
+    url: '',
+    body: {},
 
-  const [restMethod, setRestMethod] = useState('');
-  const [queryUrl, setQueryUrl] = useState('');
-  const [body, setBody] = useState({});
+  }
+}
+
+const Form = ({handleApiCall}) => {
+
+  let [state, dispatch] = useReducer(appReducer, initialState);
+
+  const { restData } = state;
+
+  const setRestData = (payload) => dispatch ({props: 'restData', payload});
 
   const handleSubmit = e =>{
     e.preventDefault();
-    const formData = {
-      method: restMethod,
-      url: queryUrl,
-      body: body,
-      // https://pokeapi.co/api/v2/pokemon
-    };
-    handleApiCall(formData);
+    handleApiCall(restData);
   }
 
   const handleRestMethod = e => {
     e.preventDefault();
-    setRestMethod(e.target.id);
+    setRestData({...restData, method: e.target.id});
  
     }
+
+  const handleOnChange = (e) => {
+    e.preventDefault();
+    setRestData({...restData, url: e.target.value, data: e.target?.data?.value})
+  } 
 
     return (
       <>
         <form onSubmit={handleSubmit}>
           <label >
             <span>URL: </span>
-            <input name='url' type='text' onChange={(e) => setQueryUrl(e.target.value)}/>
+            <input name='url' type='text' onChange={handleOnChange}/>
             <button type="submit">GO!</button>
           </label>
           <label className="methods">
@@ -42,8 +52,8 @@ const Form = (props) => {
           </label>
           <label>
             {
-            restMethod === 'post' || restMethod === 'put'?
-            <textarea name='json-field' onChange={(e) => setBody(e.target.value)}/> : null
+            restData.method === 'post' || restData.method === 'put'?
+            <textarea name='json-field' /> : null
             }
           </label>
         </form>

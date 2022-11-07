@@ -9,60 +9,61 @@ import './app.scss';
 import Header from './components/header/header.jsx';
 import Footer from './components/footer/footer.jsx';
 import Form from './components/form/form.jsx';
+import History from './components/history/history.jsx';
 import Results from './components/results/results.jsx';
 
 
-const initialState = {};
+const initialState = {
+  data: null,
+  requestParams: null,
+  queryHistory: [],
+};
 
-const queryReducer = (queryHistory, action) => {
-  return {...queryHistory, query: [...queryHistory, action.payload]}
+export function appReducer (state, action){
+  const { payload, props } = action;
+  let newState = {...state};
+  newState[props] = payload;
+  return newState;
 }
 
-const App = (props) => {
+const App = () => {
 
-  let [data, setData] = useState(null);
-  const [requestParams, setRequestParams] = useState({});
+  let [state, dispatch] = useReducer(appReducer, initialState);
 
-  let [queryHistory, dispatch] = useReducer(queryReducer, initialState);
+  const {data, requestParams, queryHistory} = state;
 
-  const addQuery = () => {
-    let action = {
-      method: data.method,
-      url: data.url,
-      body: data.body,
-    }
-    dispatch(action);
+  const setData = (payload) => dispatch({props: 'data', payload});
+
+  const setHistory = (payload) => {
+    dispatch({props: 'queryHistory', payload: [...queryHistory, payload]});
   }
 
-  useEffect(() => {
-    if(requestParams.method === 'get'){
-      getRequest(requestParams);
-      addQuery();
-      console.log(queryHistory);
-    }
-    if(requestParams.method === 'post'){
-      postRequest(requestParams);
-      addQuery();
-      console.log(queryHistory);
-    }
-    // if(requestParams.method === 'put'){
-    //   putRequest(requestParams);
-    // }
-    // if(requestParams.method === 'delete'){
-    //   deleteRequest(requestParams);
-    // }
-  },[requestParams]);
 
-  const callApi = (requestParams) => {
 
-      console.log(requestParams.body);
-      setRequestParams(requestParams);
+  const queryParams = (payload) => {
+    dispatch ({
+      props: 'requestParams', payload
+    })
+
+    callApi(payload);
+  }
+
+  const callApi = async (requestParams) => {
+
+      if(requestParams.method === 'get'){
+        getRequest(requestParams);
+      }
+
+      if(requestParams.method === 'post'){
+        postRequest(requestParams);
+      }
 
     }
 
   async function getRequest(params){
      await axios.get(params.url).then(res => {
       setData(res.data);
+      setHistory({data: res.data.restData, params});
     })
     .catch(err => {
       let message = `${err.response.data.error}. ${err.message} ${err.code}.`;
@@ -73,7 +74,7 @@ const App = (props) => {
   async function postRequest(params){
     await axios.post(params.url, params.body).then(res=> {
       setData([...res.data, res.data.body])
-      console.log(data);
+      setHistory({data: res.data, params});
     })
     .catch(err => {
       let message = `${err.response.data.error}. ${err.message} ${err.code}.`;
@@ -81,22 +82,15 @@ const App = (props) => {
     });
   }
   
-  // function putRequest(params){
-
-  // }
-
-  // function deleteRequest(params){
-
-  // }
-
     return (
       <React.Fragment>
         <Header />
-        <div>Request Method: {requestParams.method}</div>
-        <div>URL: {requestParams.url}</div>
+        <div>Request Method: {requestParams?.method}</div>
+        <div>URL: {requestParams?.url}</div>
         {/* <Form/> */}
-        <Form handleApiCall={callApi} />
+        <Form handleApiCall={queryParams} />
         <Results data={data} />
+        <History queryHistory={queryHistory}/>
         <Footer />
       </React.Fragment>
     );

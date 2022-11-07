@@ -4,7 +4,7 @@ const Results = (props) => {
   let {data} = props;
     return (
       <section>
-        <pre>{data ? JSON.stringify(data, undefined, 2) : null}</pre>
+        <pre data-testid='data'>{data ? JSON.stringify(data, undefined, 2) : null}</pre>
       </section>
     );
   }
