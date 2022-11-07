@@ -24,3 +24,8 @@ Altered App.js from a class to a function and implemented hooks within it and ch
 
 ## Phase 3
 
+Application now uses axios requests to support real API interaction with state hooks.
+
+## Phase 4
+
+Refactored code to use reducer hooks in place of useEffect hooks. 
